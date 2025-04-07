@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5100/api/auth/login', {
+            const response = await fetch('https://bidsmart-server.onrender.com/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(JSON.stringify(data), 'success');
                 setTimeout(() => {
                     // Redirect to the homepage or a protected page (e.g., dashboard)
-                    window.location.href = 'http://localhost:5501/dashboard.html'; // Change this to the desired page
+                    window.location.href = 'https://bidsmart-server.onrender.com/dashboard.html'; // Change this to the desired page
                 }, 3000);
             } else {
                 showToast(data.msg || 'Invalid credentials. Please try again.', 'error');
