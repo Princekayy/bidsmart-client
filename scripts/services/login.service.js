@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast("login successful", 'success');
                 setTimeout(() => {
                     // Redirect to the homepage or a protected page (e.g., dashboard)
-                    window.location.href = 'https://bidsmart-server.onrender.com/dashboard.html'; // Change this to the desired page
+                    window.location.href = '/dashboard.html'; // Change this to the desired page
                 }, 3000);
             } else {
                 showToast(data.msg || 'Invalid credentials. Please try again.', 'error');
