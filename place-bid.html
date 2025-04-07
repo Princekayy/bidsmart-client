@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auction Bid Page</title>
+</head>
+<body>
+
+  <h2>Place Your Bid</h2>
+
+  <input type="number" id="bid" placeholder="Your Bid Amount" />
+  <button onclick="placeBid()">Submit Bid</button>
+
+  <p id="message"></p>
+
+  <script>
+    // Function to get URL parameter 'itemId' from the query string
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // Function to handle placing a bid
+    async function placeBid() {
+      const bid = parseFloat(document.getElementById("bid").value);
+      const message = document.getElementById("message");
+      const itemId = getQueryParam("itemId");
+      const token = localStorage.getItem("token");
+
+      // Check if user is logged in
+      if (!token) {
+        message.textContent = "You must be logged in to place a bid.";
+        message.style.color = "red";
+        return;
+      }
+
+      // Check if itemId exists in the URL
+      if (!itemId) {
+        message.textContent = "Missing itemId in URL.";
+        message.style.color = "red";
+        return;
+      }
+
+      // Check if the bid amount is valid
+      if (isNaN(bid)) {
+        message.textContent = "Please enter a valid bid amount.";
+        message.style.color = "red";
+        return;
+      }
+
+      try {
+        // Send POST request to place the bid
+        const res = await fetch("http://localhost:5100/api/bid/place-bid", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`  // Add the token to Authorization header
+          },
+          body: JSON.stringify({
+            item: itemId,
+            amount: bid
+          })
+        });
+
+        const data = await res.json();
+
+        // Handle failed response
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to place bid");
+        }
+
+        // Success: Display success message
+        message.textContent = `Your bid of $${bid} has been placed successfully!`;
+        message.style.color = "green";
+
+        // Clear the input field
+        document.getElementById("bid").value = "";
+
+      } catch (err) {
+        // Error: Display the error message
+        message.textContent = err.message || "Error placing bid.";
+        message.style.color = "red";
+      }
+    }
+
+  </script>
+
+</body>
+</html>

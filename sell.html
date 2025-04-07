@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidSmart - Sell Item</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Sell a New Item</h1>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="sell.html">Sell New Item</a>
+        <a href="my-items.html">MyItems</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="price-guide.html">Price Guide</a>
+        <a href="login.html" id="login-link">Login</a>
+        <a href="register.html" id="register-link">Register</a>
+      </nav>
+
+    <main class="container">
+        <form id="sellItemForm" action="#" method="POST" enctype="multipart/form-data">
+            <label for="itemName">Item Name:</label>
+            <input type="text" id="itemName" name="itemName" required>
+            <br><br>
+
+            <label for="itemPhoto">Upload Photo:</label>
+            <input type="file" id="itemPhoto" name="itemPhoto" accept="image/*" required>
+            <br><br>
+
+            <label for="itemDescription">Description:</label>
+            <textarea id="itemDescription" name="itemDescription" required></textarea>
+            <br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="quick-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="help.html">Help</a></li>
+                    <li><a href="price-guide.html">Price Guide</a></li>
+                </ul>
+            </div>
+
+            <div class="comments">
+                <h3>Comments From BidSmart Users</h3>
+                <p>"Great platform to find deals!"</p>
+                <p>"Easy to use and highly recommended!"</p>
+                <p>"Customer support is excellent!"</p>
+            </div>
+
+            <div class="newsletter">
+                <h3>Join Our Newsletter</h3>
+                <form id="newsletterForm" action="#" method="POST">
+                    <label for="newsletterEmail">Email:</label>
+                    <input type="email" id="newsletterEmail" name="newsletterEmail" required />
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+
+            <div class="logo">
+                <p>Logo Placeholder</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript to handle the form submission
+        const sellItemForm = document.getElementById('sellItemForm');
+
+        sellItemForm.addEventListener('submit', async (event) => {
+            event.preventDefault();  // Prevent form from submitting the default way
+
+            const itemName = document.getElementById('itemName').value;
+            const itemDescription = document.getElementById('itemDescription').value;
+            const itemPhoto = document.getElementById('itemPhoto').files[0];
+
+            if (!itemName || !itemDescription || !itemPhoto) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', itemName);
+            formData.append('description', itemDescription);
+            formData.append('thumbnail', itemPhoto);
+
+            // Retrieve token from localStorage
+            const token = localStorage.getItem('token');
+            console.log("token: " + JSON.stringify(token))
+            if (!token) {
+                alert('You must be logged in to sell an item');
+                return;
+            }
+
+            try {
+                // Send the POST request to sell the item
+                const response = await fetch('http://localhost:5100/api/items/sell', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,  // Pass the token in Authorization header
+                    },
+                    body: formData,
+                });
+
+                const result = await response.json();
+                console.log("result: " + JSON.stringify(result))
+                if (response.ok) {
+                    alert('Item listed successfully!');
+                } else {
+                    alert(`Failed to list item: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error while selling item:', error);
+                alert('An error occurred while selling the item.');
+            }
+        });
+    </script>
+</body>
+</html>

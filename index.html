@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BidSmart - Home</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- If you're not using npm, add jwt-decode via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to BidSmart</h1>
+    </header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="sell.html">Sell New Item</a>
+      <a href="my-items.html">MyItems</a>
+      <a href="help.html">Help</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="price-guide.html">Price Guide</a>
+      <a href="login.html" id="login-link">Login</a>
+      <a href="register.html" id="register-link">Register</a>
+    </nav>
+    <main class="container">
+      <h2>Items for Sale</h2>
+      <div class="card-container" id="itemsContainer">
+        <!-- Cards will be inserted here dynamically -->
+      </div>
+    </main>
+    <footer>
+      <div class="footer-container">
+        <div class="quick-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+            <li><a href="help.html">Help</a></li>
+            <li><a href="price-guide.html">Price Guide</a></li>
+          </ul>
+        </div>
+        <div class="comments">
+          <h3>Comments From BidSmart Users</h3>
+          <p>"Great platform to find deals!"</p>
+          <p>"Easy to use and highly recommended!"</p>
+          <p>"Customer support is excellent!"</p>
+        </div>
+        <div class="newsletter">
+          <h3>Join Our Newsletter</h3>
+          <form id="newsletterForm" action="#" method="POST">
+            <label for="newsletterEmail">Email:</label>
+            <input
+              type="email"
+              id="newsletterEmail"
+              name="newsletterEmail"
+              required
+            />
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+        <div class="logo">
+          <p>Logo Placeholder</p>
+        </div>
+      </div>
+    </footer>
+    <script src="./scripts/util.js"></script>
+    <script>
+      // Function to fetch all items and display them
+      async function fetchItems() {
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+
+        if (!token) {
+          console.error('No token found in localStorage.');
+        }
+
+        const url = 'http://localhost:5100/api/items'; // Placeholder URL for the items API endpoint
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch items');
+          }
+
+          const items = await response.json();
+          console.log("items: " + JSON.stringify(items))
+          // Get the container where we will append item cards
+          const container = document.getElementById('itemsContainer');
+          container.innerHTML = ''; // Clear any existing content
+
+          // Loop through the items and create cards for them
+          items && items.data.forEach(item => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+
+            const cardImageContainer = document.createElement('div');
+            cardImageContainer.classList.add('card-image-container');
+
+            // Image 1 (main image)
+            const img = document.createElement('img');
+            img.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg'; // Fallback to default image if no photo is provided
+            img.alt = item.name || 'Item image';
+            img.classList.add('card-image');
+
+            // Image 2 (focused image)
+            const imgFocus = document.createElement('img');
+            imgFocus.src = `http://localhost:5100/uploads/${item.thumbnail}`  || './Images/default-image.jpg'; // Same as above
+            imgFocus.alt = item.name || 'Item image';
+            imgFocus.classList.add('card-image-focus');
+
+            cardImageContainer.appendChild(img);
+            cardImageContainer.appendChild(imgFocus);
+
+            const textContainer = document.createElement('div');
+            textContainer.classList.add('text-container');
+
+            const title = document.createElement('h1');
+            title.textContent = item.name;
+
+            // const description = document.createElement('p');
+            // description.textContent = item.description;
+
+            const seller = document.createElement('h3');
+            seller.textContent = `Seller: ${item.seller.email || 'Unknown Seller'}`;
+
+            const dateAdded = document.createElement('h6');
+            dateAdded.textContent = `Date Added: ${new Date(item.created_date).toLocaleDateString()}`;
+         
+            textContainer.appendChild(title);
+            // textContainer.appendChild(description);
+            textContainer.appendChild(seller);
+            textContainer.appendChild(dateAdded);
+            if(isLoggedIn()){
+            const link = document.createElement('a');
+            link.href = `/details.html?productId=${item._id}`;
+            link.innerText = 'More information';
+            link.target = '_blank'; 
+            textContainer.appendChild(link)
+            }
+
+            card.appendChild(cardImageContainer);
+            card.appendChild(textContainer);
+
+            container.appendChild(card);
+          });
+
+        } catch (error) {
+          console.error('Error fetching items:', error);
+        }
+      }
+      async function showContentBasedOnAuth() {
+        const loggedInDiv = document.getElementById('login-link');
+        const registerDiv = document.getElementById('register-link');
+        const result = isLoggedIn();
+        console.log("result: " + result)
+        if(isLoggedIn()){
+          loggedInDiv.style.display = "none";
+          registerDiv.style.display = "none";
+        } else {
+          loggedInDiv.style.display = 'block';
+          registerDiv.style.display = "block";
+        }
+      }
+      // Call the function to fetch and display items when the page loads
+     
+      document.addEventListener('DOMContentLoaded', () => {
+        showContentBasedOnAuth();  
+        fetchItems();
+      });
+    </script>
+  </body>
+</html>

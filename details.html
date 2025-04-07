@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidSmart - Item Details</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>BidSmart Auction</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="sell.html">Sell New Item</a>
+            <a href="my-items.html">My Items</a>
+            <a href="#" id="logout-link">Logout</a>
+        </nav>
+    </header>
+    <main class="details-container">
+        <div class="details-card">
+            <!-- Image Section -->
+            <div class="details-card-image-container">
+                <img id="item-image" class="details-card-image" src="https://via.placeholder.com/600x350" alt="Item Image">
+              </div>
+            <!-- Text Content Section -->
+            <div class="details-text-container">
+                <h2 class="details-title"></h2>
+                <p class="details-description"><strong>Description:</strong> <span id="item-description"></span></p>
+                <p class="details-date"><strong>Date Added:</strong> <span id="item-date"></span></p>
+                <div class="details-seller-contact">
+                  <p><strong>Seller's Contact:</strong></p>
+                  <ul>
+                    <li>Phone: <a title="phonenumber" id="seller-phone" href="#"></a></li>
+                    <li>Email: <a title="email" id="seller-email" href="#"></a></li>
+                  </ul>
+                </div>
+                <p class="details-bid"><strong>Current Bid:</strong> £<span id="item-bid">50</span></p>
+                <a class="details-button" id="place-bid-button" href="place-bid.html">Place Bid</a>
+              </div>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-container">
+            <div>
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="sell.html">Sell New Item</a></li>
+                    <li><a href="my-items.html">My Items</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>About BidSmart</h3>
+                <p>Your trusted auction platform to buy and sell unique items!</p>
+            </div>
+        </div>
+        <p>&copy; 2024 BidSmart. All rights reserved.</p>
+    </footer>
+    <script src="./scripts/util.js"></script>
+    <script>
+      // Function to fetch item details and display them
+      async function fetchItems() {
+        const queryString = window.location.search;
+        const params = new URLSearchParams(queryString);
+        const id = params.get("productId");
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+
+        if (!token) {
+          console.error('No token found in localStorage.');
+        }
+
+        const url = `http://localhost:5100/api/items/${id}`; // Placeholder URL for the items API endpoint
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch item details');
+          }
+
+          const itemData = await response.json();
+          const item = itemData.data;
+
+          // Update the HTML with the item details
+          document.querySelector('.details-title').innerText = item.name;
+          document.getElementById('item-description').innerText = item.description;
+          document.getElementById('item-date').innerText = new Date(item.created_date).toLocaleDateString();
+          document.getElementById('seller-phone').innerText = item.seller.phone;
+          document.getElementById('seller-phone').href = `tel:${item.seller.phone}`;
+          document.getElementById('seller-email').innerText = item.seller.email;
+          document.getElementById('seller-email').href = `mailto:${item.seller.email}`;
+          const image = document.getElementById('item-image');
+          image.src = `http://localhost:5100/uploads/${item.thumbnail}`;
+          image.alt = item.name;
+
+          // Update the 'Place Bid' button's href to include the itemId in the query string
+          const placeBidButton = document.getElementById('place-bid-button');
+          placeBidButton.href = `place-bid.html?itemId=${id}`;
+
+        } catch (error) {
+          console.error('Error fetching item details:', error);
+        }
+      }
+
+      // Call the function to fetch and display item details when the page loads
+      document.addEventListener('DOMContentLoaded', () => {
+        fetchItems();
+      });
+    </script>
+</body>
+</html>

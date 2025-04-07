@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidSmart - My Items</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- If you're not using npm, add jwt-decode via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>My Items</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="sell.html">Sell New Item</a>
+        <a href="my-items.html">MyItems</a>
+        <a href="help.html">Help</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="price-guide.html">Price Guide</a>
+        <a href="login.html" id="login-link">Login</a>
+        <a href="register.html" id="register-link">Register</a>
+      </nav>
+    <main class="container">
+        <h2>Items You've Listed</h2>
+        <div class="card-container" id="itemsContainer">
+            <!-- Cards will be inserted here dynamically -->
+          </div>
+    </main>
+    <footer>
+        <div class="footer-container">
+          <!-- Quick Links Section -->
+          <div class="quick-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact Us</a></li>
+              <li><a href="help.html">Help</a></li>
+              <li><a href="price-guide.html">Price Guide</a></li>
+            </ul>
+          </div>
+  
+          <!-- Comments Section -->
+          <div class="comments">
+            <h3>Comments From BidSmart Users</h3>
+            <p>"Great platform to find deals!"</p>
+            <p>"Easy to use and highly recommended!"</p>
+            <p>"Customer support is excellent!"</p>
+          </div>
+  
+          <!-- Newsletter Signup Section -->
+          <div class="newsletter">
+            <h3>Join Our Newsletter</h3>
+            <form id="newsletterForm" action="#" method="POST">
+              <label for="newsletterEmail">Email:</label>
+              <input
+                type="email"
+                id="newsletterEmail"
+                name="newsletterEmail"
+                required
+              />
+              <button type="submit">Subscribe</button>
+            </form>
+          </div>
+  
+          <!-- Logo Section -->
+          <div class="logo">
+            <p>Logo Placeholder</p>
+          </div>
+        </div>
+      </footer>
+      <script src="./scripts/util.js"></script>
+      <script>
+        // Function to fetch all items and display them
+        async function fetchItems() {
+          const token = localStorage.getItem('token'); // Get the token from localStorage
+  
+          if (!token) {
+            console.error('No token found in localStorage.');
+          }
+  
+          const url = 'http://localhost:5100/api/items/my-items'; // Placeholder URL for the items API endpoint
+          try {
+            const response = await fetch(url, {
+              method: 'GET',
+              headers: {
+                Authorization: `Bearer ${token}`
+            }
+            });
+  
+            if (!response.ok) {
+              throw new Error('Failed to fetch items');
+            }
+  
+            const items = await response.json();
+            console.log("items: " + JSON.stringify(items))
+            // Get the container where we will append item cards
+            const container = document.getElementById('itemsContainer');
+            container.innerHTML = ''; // Clear any existing content
+  
+            items && items.data.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+
+                const cardImageContainer = document.createElement('div');
+                cardImageContainer.classList.add('card-image-container');
+
+                const img = document.createElement('img');
+                img.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg';
+                img.alt = item.name || 'Item image';
+                img.classList.add('card-image');
+
+                const imgFocus = document.createElement('img');
+                imgFocus.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg';
+                imgFocus.alt = item.name || 'Item image';
+                imgFocus.classList.add('card-image-focus');
+
+                cardImageContainer.appendChild(img);
+                cardImageContainer.appendChild(imgFocus);
+
+                const textContainer = document.createElement('div');
+                textContainer.classList.add('text-container');
+
+                const title = document.createElement('h1');
+                title.textContent = item.name;
+
+                const dateAdded = document.createElement('h6');
+                dateAdded.textContent = `Date Added: ${new Date(item.created_date).toLocaleDateString()}`;
+
+                const statusText = document.createElement('p');
+                statusText.textContent = `Status: ${item.status}`;
+                statusText.style.fontWeight = 'bold';
+
+                // ✅ Mark as Sold Button
+                const soldButton = document.createElement('button');
+                soldButton.textContent = 'Mark as Sold';
+                soldButton.style.marginTop = '10px';
+                soldButton.style.padding = '6px 12px';
+                soldButton.style.backgroundColor = '#28a745';
+                soldButton.style.color = 'white';
+                soldButton.style.border = 'none';
+                soldButton.style.cursor = 'pointer';
+
+                // Show only if AVAILABLE
+                if (item.status === 'AVAILABLE') {
+                    soldButton.addEventListener('click', async () => {
+                    try {
+                        const token = localStorage.getItem('token');
+                        const response = await fetch(`http://localhost:5100/api/items/${item._id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`
+                        }
+                        });
+
+                        if (response.ok) {
+                        alert('Item marked as SOLD!');
+                        fetchItems(); // Refresh item list
+                        } else {
+                        const res = await response.json();
+                        console.error(res.message || 'Failed to update item');
+                        }
+                    } catch (err) {
+                        console.error('Error marking item as sold:', err);
+                    }
+                    });
+
+                    textContainer.appendChild(soldButton);
+                }
+
+                textContainer.appendChild(title);
+                textContainer.appendChild(dateAdded);
+                textContainer.appendChild(statusText);
+
+                card.appendChild(cardImageContainer);
+                card.appendChild(textContainer);
+
+                container.appendChild(card);
+            });
+
+          } catch (error) {
+            console.error('Error fetching items:', error);
+          }
+        }
+        async function showContentBasedOnAuth() {
+        //   const loggedInDiv = document.getElementById('login-link');
+        //   const registerDiv = document.getElementById('register-link');
+        //   const result = isLoggedIn();
+        //   console.log("result: " + result)
+        //   if(isLoggedIn()){
+        //     loggedInDiv.style.display = "none";
+        //     registerDiv.style.display = "none";
+        //   } else {
+        //     loggedInDiv.style.display = 'block';
+        //     registerDiv.style.display = "block";
+        //   }
+        }
+        // Call the function to fetch and display items when the page loads
+       
+        document.addEventListener('DOMContentLoaded', () => {
+          showContentBasedOnAuth();  
+          fetchItems();
+        });
+      </script>
+</body>
+</html>
