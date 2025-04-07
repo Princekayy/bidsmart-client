@@ -69,7 +69,7 @@
           console.error('No token found in localStorage.');
         }
 
-        const url = `http://localhost:5100/api/items/${id}`; // Placeholder URL for the items API endpoint
+        const url = `https://bidsmart-server.onrender.com/api/items/${id}`; // Placeholder URL for the items API endpoint
         try {
           const response = await fetch(url, {
             method: 'GET',
@@ -94,7 +94,7 @@
           document.getElementById('seller-email').innerText = item.seller.email;
           document.getElementById('seller-email').href = `mailto:${item.seller.email}`;
           const image = document.getElementById('item-image');
-          image.src = `http://localhost:5100/uploads/${item.thumbnail}`;
+          image.src = `https://bidsmart-server.onrender.com/uploads/${item.thumbnail}`;
           image.alt = item.name;
 
           // Update the 'Place Bid' button's href to include the itemId in the query string
