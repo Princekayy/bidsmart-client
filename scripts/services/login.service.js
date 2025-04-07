@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('token', data.token);
 
                 // Show success toast and redirect
-                showToast(JSON.stringify(data), 'success');
+                showToast("login successful", 'success');
                 setTimeout(() => {
                     // Redirect to the homepage or a protected page (e.g., dashboard)
                     window.location.href = 'https://bidsmart-server.onrender.com/dashboard.html'; // Change this to the desired page
