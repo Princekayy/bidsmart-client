@@ -75,7 +75,7 @@
           console.error('No token found in localStorage.');
         }
 
-        const url = 'http://localhost:5100/api/items'; // Placeholder URL for the items API endpoint
+        const url = 'https://bidsmart-server.onrender.com/api/items'; // Placeholder URL for the items API endpoint
         try {
           const response = await fetch(url, {
             method: 'GET',
@@ -101,13 +101,13 @@
 
             // Image 1 (main image)
             const img = document.createElement('img');
-            img.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg'; // Fallback to default image if no photo is provided
+            img.src = `https://bidsmart-server.onrender.com/uploads/${item.thumbnail}` || './Images/default-image.jpg'; // Fallback to default image if no photo is provided
             img.alt = item.name || 'Item image';
             img.classList.add('card-image');
 
             // Image 2 (focused image)
             const imgFocus = document.createElement('img');
-            imgFocus.src = `http://localhost:5100/uploads/${item.thumbnail}`  || './Images/default-image.jpg'; // Same as above
+            imgFocus.src = `https://bidsmart-server.onrender.com/uploads/${item.thumbnail}`  || './Images/default-image.jpg'; // Same as above
             imgFocus.alt = item.name || 'Item image';
             imgFocus.classList.add('card-image-focus');
 

@@ -82,7 +82,7 @@
             console.error('No token found in localStorage.');
           }
   
-          const url = 'http://localhost:5100/api/items/my-items'; // Placeholder URL for the items API endpoint
+          const url = 'https://bidsmart-server.onrender.com/api/items/my-items'; // Placeholder URL for the items API endpoint
           try {
             const response = await fetch(url, {
               method: 'GET',
@@ -109,12 +109,12 @@
                 cardImageContainer.classList.add('card-image-container');
 
                 const img = document.createElement('img');
-                img.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg';
+                img.src = `https://bidsmart-server.onrender.com/uploads/${item.thumbnail}` || './Images/default-image.jpg';
                 img.alt = item.name || 'Item image';
                 img.classList.add('card-image');
 
                 const imgFocus = document.createElement('img');
-                imgFocus.src = `http://localhost:5100/uploads/${item.thumbnail}` || './Images/default-image.jpg';
+                imgFocus.src = `https://bidsmart-server.onrender.com/uploads/${item.thumbnail}` || './Images/default-image.jpg';
                 imgFocus.alt = item.name || 'Item image';
                 imgFocus.classList.add('card-image-focus');
 
@@ -149,7 +149,7 @@
                     soldButton.addEventListener('click', async () => {
                     try {
                         const token = localStorage.getItem('token');
-                        const response = await fetch(`http://localhost:5100/api/items/${item._id}`, {
+                        const response = await fetch(`https://bidsmart-server.onrender.com/api/items/${item._id}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',

@@ -51,7 +51,7 @@
 
       try {
         // Send POST request to place the bid
-        const res = await fetch("http://localhost:5100/api/bid/place-bid", {
+        const res = await fetch("https://bidsmart-server.onrender.com/api/bid/place-bid", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
